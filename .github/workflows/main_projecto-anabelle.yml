@@ -29,6 +29,11 @@ jobs:
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libcairo2-dev pkg-config
+
       - name: Create and start virtual environment
         run: |
           python -m venv venv
@@ -82,4 +87,3 @@ jobs:
           app-name: 'projecto-anabelle'
           slot-name: 'Production'
           package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
-          
