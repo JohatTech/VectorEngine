@@ -30,7 +30,8 @@ cymem==2.0.13
 dataclasses-json==0.6.7
 distro==1.9.0
 emoji==2.15.0
-en_core_web_sm==3.8.0
+https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl
+
 et_xmlfile==2.0.0
 filelock==3.29.0
 filetype==1.2.0
@@ -114,7 +115,8 @@ python-dotenv==1.2.2
 python-iso639==2026.4.20
 python-magic==0.4.27
 python-oxmsg==0.0.2
-pywin32==311
+pywin32==311; sys_platform == 'win32'
+
 PyYAML==6.0.3
 qdrant-client==1.17.1
 RapidFuzz==3.14.5
