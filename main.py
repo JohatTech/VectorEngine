@@ -119,8 +119,10 @@ def main() -> None:
     logger.info("Max workers   →  %d", config.MAX_WORKERS)
     
     # Show which watcher mode will be used
-    if config.USE_POLLING_WATCHER:
-        logger.info("Watcher mode  →  POLLING (network-safe)  │  Interval  →  %.1fs", config.POLLING_INTERVAL_SECONDS)
+    if config.USE_BLOB_WATCHER:
+        logger.info("Watcher mode  →  AZURE BLOB STORAGE  │  Container  →  %s", config.AZURE_STORAGE_CONTAINER_NAME)
+    elif config.USE_POLLING_WATCHER:
+        logger.info("Watcher mode  →  POLLING (local)  │  Interval  →  %.1fs", config.POLLING_INTERVAL_SECONDS)
     else:
         logger.info("Watcher mode  →  EVENT-BASED (watchdog)  │  Stability wait  →  %ds", config.STABILITY_WAIT_SECONDS)
 
@@ -138,7 +140,21 @@ def main() -> None:
         backfill_existing_folders(watch_path)
 
     # ── Start the live watcher ────────────────────────────────────────────
-    if config.USE_POLLING_WATCHER:
+    if config.USE_BLOB_WATCHER:
+        from blob_watcher import AzureBlobWatcher
+        watcher = AzureBlobWatcher(poll_interval=config.POLLING_INTERVAL_SECONDS)
+        watcher.start()
+        
+        logger.info("Azure Blob watcher is live. Press Ctrl+C to stop.")
+        
+        try:
+            while True:
+                time.sleep(1)
+        except KeyboardInterrupt:
+            logger.info("Shutdown requested – stopping watcher …")
+            watcher.stop()
+            
+    elif config.USE_POLLING_WATCHER:
         # Network-safe polling watcher
         watcher = PollingFolderWatcher(
             watch_path=watch_path,

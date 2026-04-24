@@ -94,6 +94,14 @@ EMBEDDING_BATCH_SIZE: int = int(os.getenv("EMBEDDING_BATCH_SIZE", "50"))
 # Seconds to wait between embedding batches to respect rate limits.
 EMBEDDING_BATCH_DELAY: float = float(os.getenv("EMBEDDING_BATCH_DELAY", "1.0"))
 
+# ── Azure Blob Storage Watcher ───────────────────────────────────────────────
+# Enable Azure Blob Storage watching (polls the container for new blobs)
+USE_BLOB_WATCHER: bool = os.getenv("USE_BLOB_WATCHER", "False").lower() in ("true", "1", "yes")
+# Azure Storage Connection String
+AZURE_STORAGE_CONNECTION_STRING: str | None = os.getenv("AZURE_STORAGE_CONNECTION_STRING")
+# Azure Storage Container Name
+AZURE_STORAGE_CONTAINER_NAME: str | None = os.getenv("AZURE_STORAGE_CONTAINER_NAME")
+
 # ── N8N Webhook ───────────────────────────────────────────────────────────────
 # URL of the N8N Webhook node that will be called after ingestion completes.
 # Leave empty/unset to disable the callback.
