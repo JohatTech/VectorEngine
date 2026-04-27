@@ -76,4 +76,4 @@ jobs:
           app-name: 'projecto-anabelle'
           slot-name: 'Production'
           package: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_4431965B82364B77B4D967A8193F2E1E }}
+          
