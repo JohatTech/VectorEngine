@@ -29,7 +29,8 @@ def _require(name: str) -> str:
 
 
 # ── Watched Folder ────────────────────────────────────────────────────────────
-WATCH_FOLDER_PATH: str = _require("WATCH_FOLDER_PATH")
+# Optional: only used for local monitoring (main.py)
+WATCH_FOLDER_PATH: str | None = os.getenv("WATCH_FOLDER_PATH")
 
 # ── Chunking ──────────────────────────────────────────────────────────────────
 CHUNK_SIZE: int = int(os.getenv("CHUNK_SIZE", "1000"))
