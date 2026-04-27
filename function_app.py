@@ -11,7 +11,7 @@ app = func.FunctionApp()
 logging.info("VectorizerEngine Function App starting — registering blob trigger …")
 
 @app.blob_trigger(arg_name="myblob", 
-                  path="licitaciones/{name}",
+                  path="licitaciones/",
                   connection="AZURE_STORAGE_CONNECTION_STRING") 
 def blob_trigger_handler(myblob: func.InputStream):
     """
