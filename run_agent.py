@@ -1,3 +1,22 @@
+"""
+──────────────────────────────────────────────────────────────────────────────
+VectorizerEngine  ·  run_agent.py
+──────────────────────────────────────────────────────────────────────────────
+Entry point for the Autonomous RAG Agent pipeline.
+
+What it does
+────────────
+  1. Watches a local folder for new project sub-folders.
+  2. When a new folder appears, vectorizes its documents into local Qdrant.
+  3. Runs an LLM-powered RAG agent against the vectorized data.
+  4. Generates a PDF report with the analysis results.
+
+Usage
+─────
+  python run_agent.py
+──────────────────────────────────────────────────────────────────────────────
+"""
+
 import logging
 import json
 import time
@@ -10,13 +29,14 @@ os.environ.setdefault("QDRANT_MODE", "local")
 os.environ.setdefault("VECTORSTORE_TARGETS", "qdrant")
 
 import config
-from watcher import ProjectFolderHandler, PollingFolderWatcher
-from pipeline import process_project_folder
-from agent_system import AutonomousRAGAgent
-from report_generator import generate_report
+from local_module.watcher import ProjectFolderHandler, PollingFolderWatcher
+from core.pipeline import process_project_folder
+from agent_module.agent_system import AutonomousRAGAgent
+from agent_module.report_generator import generate_report
+from core.loaders import check_files_present
 
 # Configure logging
-logger = logging.getLogger("main_agent")
+logger = logging.getLogger("run_agent")
 
 def run_rag_analysis(folder: Path):
     project_name = folder.name
@@ -69,14 +89,12 @@ def run_rag_analysis(folder: Path):
 class AgentProjectHandler(ProjectFolderHandler):
 
     def _process_with_delay(self, folder: Path) -> None:
-        from loaders import check_files_present
         if check_files_present(folder, config.FILE_CHECK_MAX_RETRIES, config.FILE_CHECK_RETRY_DELAY):
             run_rag_analysis(folder)
 
 class PollingAgentWatcher(PollingFolderWatcher):
 
     def _process_folder(self, folder: Path) -> None:
-        from loaders import check_files_present
         if check_files_present(folder, config.FILE_CHECK_MAX_RETRIES, config.FILE_CHECK_RETRY_DELAY):
             run_rag_analysis(folder)
 

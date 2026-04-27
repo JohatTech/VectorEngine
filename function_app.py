@@ -2,7 +2,7 @@ import azure.functions as func
 import logging
 import os
 import sys
-from blob_service import process_blob
+from blob_module.blob_service import process_blob
 # Ensure current directory is in path for imports
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 

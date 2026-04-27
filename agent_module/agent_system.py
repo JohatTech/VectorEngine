@@ -7,7 +7,7 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 from langchain_core.tools import create_retriever_tool
 from qdrant import QdrantLocalModule, sanitise_collection_name
-from embeddings import get_embeddings
+from core.embeddings import get_embeddings
 import config
 
 logger = logging.getLogger("agent_system")

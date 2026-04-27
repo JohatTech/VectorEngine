@@ -1,28 +1,28 @@
 """
 ──────────────────────────────────────────────────────────────────────────────
-VectorizerEngine  ·  main.py
+VectorizerEngine  ·  run_local.py
 ──────────────────────────────────────────────────────────────────────────────
-Entry point for the VectorizerEngine service.
+Entry point for the Local Directory Watcher.
 
 What it does
 ────────────
   1. Validates that the watched folder exists.
   2. Optionally processes any project folders that already exist and
      have not been ingested yet (--backfill flag).
-  3. Starts a watchdog Observer that runs forever, picking up new
+  3. Starts a watcher that runs forever, picking up new
      project folders as they appear.
   4. Handles Ctrl+C gracefully.
 
 Usage
 ─────
   # Normal continuous monitoring:
-  python main.py
+  python run_local.py
 
   # Process existing folders first, then keep watching:
-  python main.py --backfill
+  python run_local.py --backfill
 
   # Process one specific folder and exit (no watching):
-  python main.py --once "Project Alpha"
+  python run_local.py --once "Project Alpha"
 ──────────────────────────────────────────────────────────────────────────────
 """
 
@@ -35,10 +35,10 @@ from pathlib import Path
 from watchdog.observers import Observer
 
 import config
-from watcher import ProjectFolderHandler, PollingFolderWatcher
-from pipeline import process_project_folder
+from local_module.watcher import ProjectFolderHandler, PollingFolderWatcher
+from core.pipeline import process_project_folder
 
-logger = logging.getLogger("main")
+logger = logging.getLogger("run_local")
 
 
 # ── CLI ───────────────────────────────────────────────────────────────────────
@@ -112,16 +112,14 @@ def main() -> None:
         logger.error("Watch path is not a directory: %s", watch_path)
         sys.exit(1)
 
-    logger.info("VectorizerEngine starting up …")
+    logger.info("VectorizerEngine — Local Watcher starting up …")
     logger.info("Watch folder  →  %s", watch_path)
     logger.info("Targets       →  %s", ", ".join(config.VECTORSTORE_TARGETS))
     logger.info("Chunk size    →  %d  │  Overlap  →  %d", config.CHUNK_SIZE, config.CHUNK_OVERLAP)
     logger.info("Max workers   →  %d", config.MAX_WORKERS)
     
     # Show which watcher mode will be used
-    if config.USE_BLOB_WATCHER:
-        logger.info("Watcher mode  →  AZURE BLOB STORAGE  │  Container  →  %s", config.AZURE_STORAGE_CONTAINER_NAME)
-    elif config.USE_POLLING_WATCHER:
+    if config.USE_POLLING_WATCHER:
         logger.info("Watcher mode  →  POLLING (local)  │  Interval  →  %.1fs", config.POLLING_INTERVAL_SECONDS)
     else:
         logger.info("Watcher mode  →  EVENT-BASED (watchdog)  │  Stability wait  →  %ds", config.STABILITY_WAIT_SECONDS)
@@ -140,21 +138,7 @@ def main() -> None:
         backfill_existing_folders(watch_path)
 
     # ── Start the live watcher ────────────────────────────────────────────
-    if config.USE_BLOB_WATCHER:
-        from blob_watcher import AzureBlobWatcher
-        watcher = AzureBlobWatcher(poll_interval=config.POLLING_INTERVAL_SECONDS)
-        watcher.start()
-        
-        logger.info("Azure Blob watcher is live. Press Ctrl+C to stop.")
-        
-        try:
-            while True:
-                time.sleep(1)
-        except KeyboardInterrupt:
-            logger.info("Shutdown requested – stopping watcher …")
-            watcher.stop()
-            
-    elif config.USE_POLLING_WATCHER:
+    if config.USE_POLLING_WATCHER:
         # Network-safe polling watcher
         watcher = PollingFolderWatcher(
             watch_path=watch_path,

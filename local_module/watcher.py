@@ -1,6 +1,6 @@
 """
 ──────────────────────────────────────────────────────────────────────────────
-VectorizerEngine  ·  watcher.py
+VectorizerEngine  ·  local_module/watcher.py
 ──────────────────────────────────────────────────────────────────────────────
 Filesystem event handler powered by the `watchdog` library, with support
 for network paths via polling-based watching.
@@ -31,8 +31,8 @@ from watchdog.events import FileSystemEventHandler, DirCreatedEvent
 from watchdog.observers import Observer
 
 import config
-from pipeline import process_project_folder
-from loaders import check_files_present
+from core.pipeline import process_project_folder
+from core.loaders import check_files_present
 
 logger = logging.getLogger("watcher")
 
