@@ -11,7 +11,7 @@ app = func.FunctionApp()
 logging.info("VectorizerEngine Function App starting — registering blob trigger …")
 
 @app.blob_trigger(arg_name="myblob", 
-                  path="licitaciones/",
+                  path="licitaciones",
                   connection="AZURE_STORAGE_CONNECTION_STRING") 
 def blob_trigger_handler(myblob: func.InputStream):
     """
@@ -26,7 +26,7 @@ def blob_trigger_handler(myblob: func.InputStream):
     try:
         # Import config and blob_service lazily to avoid startup failures
         # if env vars are not yet available during module import
-        
+        from blob_module.blob_service import process_blob
         process_blob(blob_name)
     except Exception as e:
         logging.error(f"Error in blob trigger handler: {e}", exc_info=True)
